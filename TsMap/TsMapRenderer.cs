@@ -17,7 +17,7 @@ namespace TsMap
             _palette = palette;
         }
 
-        private static PointF RotatePoint(float x, float z, float angle, float rotX, float rotZ)
+        public static PointF RotatePoint(float x, float z, float angle, float rotX, float rotZ)
         {
             var s = Math.Sin(angle);
             var c = Math.Cos(angle);
@@ -159,33 +159,60 @@ namespace TsMap
                         drawingQueue.Add(prefabLook);
                         continue;
                     }
-
+                    // This part is now made by prefab curves
+                    /*
                     foreach (var neighbourPointIndex in mapPoint.Neighbours) // TODO: Fix connection between road segments
                     {
-                        if (pointsDrawn.Contains(neighbourPointIndex)) continue;
-                        var neighbourPoint = prefabItem.Prefab.MapPoints[neighbourPointIndex];
+                    if (pointsDrawn.Contains(neighbourPointIndex)) continue;
+                    var neighbourPoint = prefabItem.Prefab.MapPoints[neighbourPointIndex];
 
-                        if ((mapPoint.Hidden || neighbourPoint.Hidden) && prefabItem.Prefab.PrefabNodes.Count + 1 <
-                            prefabItem.Prefab.MapPoints.Count) continue;
+                    if ((mapPoint.Hidden || neighbourPoint.Hidden) && prefabItem.Prefab.PrefabNodes.Count + 1 <
+                        prefabItem.Prefab.MapPoints.Count) continue;
 
-                        var newPointStart = RotatePoint(prefabStartX + mapPoint.X,
-                            prefabStartZ + mapPoint.Z, rot, originNode.X, originNode.Z);
+                    var newPointStart = RotatePoint(prefabStartX + mapPoint.X,
+                        prefabStartZ + mapPoint.Z, rot, originNode.X, originNode.Z);
 
-                        var newPointEnd = RotatePoint(prefabStartX + neighbourPoint.X,
-                            prefabStartZ + neighbourPoint.Z, rot, originNode.X, originNode.Z);
-                        
-                        TsPrefabLook prefabLook = new TsPrefabRoadLook()
-                        {
-                            Color = _palette.PrefabRoad,
-                            ZIndex = 4,
-                            Width = 10f * scaleX,
-                        };
+                    var newPointEnd = RotatePoint(prefabStartX + neighbourPoint.X,
+                        prefabStartZ + neighbourPoint.Z, rot, originNode.X, originNode.Z);
+                    
+                    TsPrefabLook prefabLook = new TsPrefabRoadLook()
+                    {
+                        Color = _palette.PrefabRoad,
+                        ZIndex = 4,
+                        Width = 10f * scaleX,
+                    };
 
-                        prefabLook.AddPoint((newPointStart.X - startX) * scaleX, (newPointStart.Y - startY) * scaleY);
-                        prefabLook.AddPoint((newPointEnd.X - startX) * scaleX, (newPointEnd.Y - startY) * scaleY);
+                    prefabLook.AddPoint((newPointStart.X - startX) * scaleX, (newPointStart.Y - startY) * scaleY);
+                    prefabLook.AddPoint((newPointEnd.X - startX) * scaleX, (newPointEnd.Y - startY) * scaleY);
 
-                        drawingQueue.Add(prefabLook);
+                    drawingQueue.Add(prefabLook);
                     }
+                    */
+                }
+
+                for (int i = 0; i < prefabItem.Prefab.PrefabCurves.Count; i++)
+                {
+                    var newPointStart = RotatePoint(prefabStartX + prefabItem.Prefab.PrefabCurves[i].start_X, prefabStartZ + prefabItem.Prefab.PrefabCurves[i].start_Z, rot, originNode.X, originNode.Z);
+                    var newPointEnd = RotatePoint(prefabStartX + prefabItem.Prefab.PrefabCurves[i].end_X, prefabStartZ + prefabItem.Prefab.PrefabCurves[i].end_Z, rot, originNode.X, originNode.Z);
+                    var color = _palette.PrefabRoad;
+                    var zind = 4;
+
+                    if ((_mapper.PrefabNav.ContainsKey(prefabItem) && _mapper.PrefabNav.ContainsKey(prefabItem) && _mapper.PrefabNav[prefabItem].Contains(prefabItem.Prefab.PrefabCurves[i])) || _mapper.RoutePrefabs.Contains(prefabItem)) {
+                        color = _palette.NavColor;
+                        zind = 1000;
+                    }
+                        
+                    TsPrefabLook prefabLook = new TsPrefabRoadLook()
+                    {
+                        Color = color,
+                        Width = 10f * scaleX,
+                        ZIndex = zind
+                    };
+
+                    prefabLook.AddPoint((newPointStart.X - startX) * scaleX, (newPointStart.Y - startY) * scaleY);
+                    prefabLook.AddPoint((newPointEnd.X - startX) * scaleX, (newPointEnd.Y - startY) * scaleY);
+                    
+                    drawingQueue.Add(prefabLook);
                 }
             }
 
@@ -240,7 +267,10 @@ namespace TsMap
 
                 var roadWidth = road.RoadLook.GetWidth() * scaleX;
 
-                g.DrawCurve(new Pen(_palette.Road, roadWidth), points.ToArray());
+                var color = _palette.Road;
+                if (_mapper.RouteRoads.Contains(road)) color = _palette.NavColor;
+                
+                g.DrawCurve(new Pen(color, roadWidth), points.ToArray());
             }
 
 

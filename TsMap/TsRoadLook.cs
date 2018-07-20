@@ -9,6 +9,11 @@ namespace TsMap
 
         public float Offset;
 
+        public bool IsHighway { get; set; }
+        public bool IsLocal { get; set; }
+        public bool IsExpress { get; set; }
+        public bool IsNoVehicles { get; set; }
+
         public readonly List<string> LanesLeft;
         public readonly List<string> LanesRight;
 
@@ -31,6 +36,11 @@ namespace TsMap
         public float GetWidth()
         {
             return Offset + 4.5f * LanesLeft.Count + 4.5f * LanesRight.Count;
+        }
+
+        public bool IsBidirectional() {
+            if (LanesLeft.Count > 0 && LanesRight.Count > 0) return true;
+            return false;
         }
 
     }

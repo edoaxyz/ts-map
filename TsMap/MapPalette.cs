@@ -48,5 +48,10 @@ namespace TsMap
         /// Brush for error text
         /// </summary>
         public Brush Error;
+
+        /// <summary>
+        /// Selected road/prefab for navigation
+        /// </summary>
+        public Brush NavColor;
     }
 }

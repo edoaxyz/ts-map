@@ -90,7 +90,13 @@ namespace TsMap
                     }
                     newPoints.Add(new PointF((conn.EndPortLocation.X - startX) * scaleX, (conn.EndPortLocation.Y - startY) * scaleY));
 
-                    var pen = new Pen(_palette.FerryLines, 50 * scaleX) { DashPattern = new[] { 10f, 10f } };
+                    var color = _palette.FerryLines;
+                    if (_mapper.RouteFerryPorts.ContainsKey(_mapper.FerryPortbyId[conn.StartPortToken]) ||
+                         _mapper.RouteFerryPorts.ContainsKey(_mapper.FerryPortbyId[conn.EndPortToken])) {
+                        color = _palette.NavColor;
+                    }
+
+                    var pen = new Pen(color, 50 * scaleX) { DashPattern = new[] { 10f, 10f } };
                     g.DrawCurve(pen, newPoints.ToArray());
                 }
             }

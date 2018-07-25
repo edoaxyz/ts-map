@@ -1,26 +1,15 @@
-## Euro Truck Simulator 2 / American Truck Simulator Map Renderer
+## ts-map with navigation mode
 
-This Application reads ATS/ETS2 files to draw roads, prefabs, map overlays, ferry lines and city names.
+<b>This is the first time I ever programmed in C#.</b>
 
-#### 1.31 (ATS/ETS2 open beta) Supported
+This is a fork of the original ts-map project that includes a navigation mode, giving the possibility to calculate the best path between two prefab items and selecting not only roads but also roads inside prefabs.
 
-![Preview of the map](/docs/preview.jpg "Preview of the map")
+### How does it calculate paths?
+Using Dijkstra's Algorithm. Every single prefab item has a dictionary that contains information of near and reachable prefabs from that specific prefab.
 
-### Supported maps / DLC
-- ATS
-    - Base
-    - Nevada
-    - Arizona
-    - New Mexico
-- ETS2
-    - Base
-    - Going East!
-    - Scandinavia
-    - Vive la France !
-    - Italia
+### Why is it so slow?
+Because Dijkstra's Algorithm explore all the nodes(prefabs) and since ETS2 currently has nearly 20000 nodes it requires some time to find the best path. There's another algorithm called A* that explore nodes that are more near to the destination calculating an heuristic distance which I think can immediately find a valid path in some milliseconds. I hope to implement it soon.
 
-#### Dependencies (NuGet)
-[DotNetZip](https://www.nuget.org/packages/DotNetZip/)
+### How to choose start and end prefabs?
 
-#### Based on
-[Original project](https://github.com/nlhans/ets2-map)
+Currently these are choosed randomly since I didn't want to deal with C# UI. The idea was to put three button: the first and the second for enabling a mode where the user can select respectively a start prefab and an end prefab in the visualized area; the third starts the calculation.

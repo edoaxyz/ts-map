@@ -77,8 +77,6 @@ namespace TsMap
         public List<TsPrefabCurve> PrefabCurves {get; private set; }
         public Dictionary<Tuple<TsPrefabNode,TsPrefabNode>, Tuple<List<TsPrefabCurve>,float>> NavigationRoutes {get; private set; }
 
-        public float indicativeWeight {get; private set;} // this is used in Dijkstra's Algorithm but it's not accurate and NEEDS IMPORVEMENT
-
         public TsPrefab(TsMapper mapper, string filePath, ulong token, string category)
         {
             _filePath = filePath;
@@ -272,8 +270,6 @@ namespace TsMap
                 if (pointInVicinity == null) TriggerPoints.Add(triggerPoint);
             }
 
-            int nDistances = 0;
-            float totDist = 0.0f;
             foreach (var inputNode in PrefabNodes)
             {
                 foreach (var outputNode in PrefabNodes)
@@ -326,14 +322,10 @@ namespace TsMap
                             path.Add(actualCurve);
                             actualCurve = distances[actualCurve].Item2;
                         }
-                        NavigationRoutes.Add(new Tuple<TsPrefabNode,TsPrefabNode>(inputNode,outputNode), new Tuple<List<TsPrefabCurve>,float>(path,length));
-                        totDist += distanceLength;
-                        nDistances++;
+                        NavigationRoutes.Add(new Tuple<TsPrefabNode,TsPrefabNode>(inputNode,outputNode), new Tuple<List<TsPrefabCurve>,float>(path,distanceLength));
                     }
                 }
             }
-
-            indicativeWeight = totDist / nDistances;
             
             _stream = null;
 
